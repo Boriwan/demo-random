@@ -6,8 +6,8 @@ import { defineConfig, fontProviders } from 'astro/config';
 
 // https://astro.build/config
 export default defineConfig({
-  site: "https://boriwan.github.io/demo-random",
-  base: "/demo-random/",
+  site: "https://boriwan.github.io",
+  base: "/demo-random",
   integrations: [mdx(), sitemap()],
   fonts: [
     {
