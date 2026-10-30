@@ -1,15 +1,18 @@
 ---
 import type { HTMLAttributes } from 'astro/types';
+import { BASE, withBase } from '../lib/base';
 
 type Props = HTMLAttributes<'a'>;
 
 const { href, class: className, ...props } = Astro.props;
-const pathname = Astro.url.pathname.replace(import.meta.env.BASE_URL, '');
+const pathname = Astro.url.pathname.replace(BASE, '/');
 const subpath = pathname.match(/[^\/]+/g);
 const isActive = href === pathname || href === '/' + (subpath?.[0] || '');
+// Internal paths are written without the base (e.g. "/about"); prepend it at render time.
+const resolvedHref = href ? withBase(href) : href;
 ---
 
-<a href={href} class:list={[className, { active: isActive }]} {...props}>
+<a href={resolvedHref} class:list={[className, { active: isActive }]} {...props}>
 	<slot />
 </a>
 <style>
