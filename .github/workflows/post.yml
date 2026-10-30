@@ -1,0 +1,47 @@
+name: Issue to Blog Post
+
+on:
+  issues:
+    types: [labeled]
+
+jobs:
+  create-post:
+    if: github.event.label.name == 'blog-post'
+    runs-on: ubuntu-latest
+    permissions:
+      issues: write
+      pull-requests: write
+      contents: write
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Generate post file
+        env:
+          ISSUE_TITLE: ${{ github.event.issue.title }}
+          ISSUE_BODY: ${{ github.event.issue.body }}
+          ISSUE_NUMBER: ${{ github.event.issue.number }}
+        run: |
+          SLUG=$(echo "$ISSUE_TITLE" | tr '[:upper:]' '[:lower:]' | sed -E 's/[^a-z0-9]+/-/g; s/^-+|-+$//g')
+          DATE=$(date +%Y-%m-%d)
+
+          mkdir -p "my-site/src/content/blog"
+          {
+            echo "---"
+            echo "title: '$ISSUE_TITLE'"
+            echo "description: 'Auto-generated from issue #${ISSUE_NUMBER}'"
+            echo "pubDate: '$DATE'"
+            echo "---"
+            echo ""
+            echo "$ISSUE_BODY"
+          } > "my-site/src/content/blog/${SLUG}.mdx"
+
+      - name: Create Pull Request
+        uses: peter-evans/create-pull-request@v6
+        with:
+          title: "Blog post: ${{ github.event.issue.title }}"
+          body: |
+            Closes #${{ github.event.issue.number }}
+          branch: "blog/${{ github.event.issue.number }}"
+          commit-message: "Add blog post from issue #${{ github.event.issue.number }}"
+          labels: |
+            auto-generated
