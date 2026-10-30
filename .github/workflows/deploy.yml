@@ -18,12 +18,12 @@ jobs:
           package-manager: npm
           node-version: 22
           path: .
-   deploy:
+    deploy:
      needs: build
      runs-on: ubuntu-latest
      enviroment:
        name: github-pages
        url: ${{ steps.deployment.outputs.path_url }}
       steps:
-          - id: deployment
-            uses: actions/deploy-pages@v4
+        - id: deployment
+          uses: actions/deploy-pages@v4
