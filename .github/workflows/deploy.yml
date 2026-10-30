@@ -1,7 +1,9 @@
 name: Deploy
-on: 
+
+on:
   push:
-    branches: [main]
+    branches:
+      - main
 
 permissions:
   contents: read
@@ -13,17 +15,19 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
+
       - uses: withastro/action@v3
-        with: 
+        with:
           package-manager: npm
           node-version: 22
           path: .
-    deploy:
-     needs: build
-     runs-on: ubuntu-latest
-     enviroment:
-       name: github-pages
-       url: ${{ steps.deployment.outputs.path_url }}
-      steps:
-        - id: deployment
-          uses: actions/deploy-pages@v4
+
+  deploy:
+    needs: build
+    runs-on: ubuntu-latest
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - id: deployment
+        uses: actions/deploy-pages@v4
